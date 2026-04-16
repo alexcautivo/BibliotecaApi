@@ -1,0 +1,5 @@
+/* Estado activo: gana a text-slate-600 del mismo elemento (evita conflicto entre utilidades Tailwind). */
+.nav-link.nav-link-active {
+  @apply font-semibold text-emerald-800;
+  @apply rounded-md bg-emerald-50 px-2 py-1 -mx-2 -my-1;
+}

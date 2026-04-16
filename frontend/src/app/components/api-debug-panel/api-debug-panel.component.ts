@@ -46,7 +46,7 @@ import { ApiCallLogEntry, ApiLogService } from '../../services/api-log.service';
 export class ApiDebugPanelComponent {
   private readonly apiLog = inject(ApiLogService);
   readonly logs = this.apiLog.logs;
-  readonly open = signal(false);
+  readonly open = signal(true);
 
   readonly trackByLogId = (_: number, e: ApiCallLogEntry) => e.id;
 }
