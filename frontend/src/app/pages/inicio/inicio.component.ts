@@ -27,6 +27,23 @@ import { mensajeApiError } from '../../utils/api-error';
         <li><strong>PATCH</strong>: cambiar solo algunos campos (incluye <code>activo: false</code> para delete pasivo).</li>
         <li><strong>DELETE</strong>: borrar definitivamente el registro en la base.</li>
       </ul>
+
+      <section class="rounded-lg border border-emerald-200 bg-emerald-50/60 p-4">
+        <h2 class="text-lg font-semibold text-slate-800">Analogía: Restaurante</h2>
+        <p class="mt-2 text-slate-600">
+          Imagina que pides comida en un restaurante. <strong>Tú</strong> eres quien quiere
+          algo (el usuario o la app en el navegador). El <strong>menú</strong> es como la
+          documentación de la API: lista lo que puedes pedir y con qué nombre. El
+          <strong>mesero</strong> es la <strong>API</strong>: recibe tu pedido en un
+          lenguaje claro, lo lleva a quien prepara la comida y te trae el plato cuando está
+          listo. La <strong>cocina</strong> es el <strong>backend</strong>: ahí se
+          preparan los datos (consultas a la base, reglas de negocio); tú no entras a la
+          cocina, solo hablas con el mesero. El <strong>plato</strong> que recibes es la
+          <strong>respuesta</strong> (por ejemplo JSON): lo que pediste, empaquetado de
+          forma entendible para el front.
+        </p>
+      </section>
+
       <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
         <p class="text-sm font-medium text-slate-700">Prueba de conexion (GET /api/salud)</p>
         <p class="mt-2 font-mono text-sm text-emerald-700" *ngIf="mensaje">{{ mensaje }}</p>

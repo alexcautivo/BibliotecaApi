@@ -364,7 +364,7 @@ def actualizar_autor_parcial(autor_id: int, datos: AutorParcial, db: SesionDB):
     description="""
 Elimina **definitivamente** la fila del autor.
 
-**409** si aun tiene libros asociados (`id_autor`). En ese caso elimina o reasigna libros, o usa PATCH con `activo=false` para ocultar el autor sin borrarlo.
+**409** si el autor sigue **activo** (debes desactivarlo antes) o si aun tiene libros asociados (`id_autor`). En el segundo caso elimina o reasigna libros, o usa PATCH con `activo=false` para ocultar el autor sin borrarlo.
 """,
     response_description="Sin cuerpo (204 No Content) si se elimino correctamente.",
 )
@@ -372,6 +372,15 @@ def eliminar_autor(autor_id: int, db: SesionDB):
     autor = db.get(Autor, autor_id)
     if autor is None:
         raise HTTPException(status_code=404, detail="Autor no encontrado")
+    if autor.activo:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "No se puede eliminar el autor de la base de datos mientras sigue activo. "
+                "Primero desactivalo (borrado pasivo: PATCH con activo=false o el boton Desactivar); "
+                "luego podras borrarlo definitivamente si no tiene libros asociados."
+            ),
+        )
     n_libros = db.query(Libro).filter(Libro.id_autor == autor_id).count()
     if n_libros > 0:
         raise HTTPException(
@@ -543,13 +552,25 @@ def actualizar_libro_parcial(libro_id: int, datos: LibroParcial, db: SesionDB):
     status_code=204,
     tags=[_TAG_DELETE],
     summary="[Libros] Eliminar fila (definitivo)",
-    description="Borra definitivamente el libro. No hay restriccion por autor salvo la integridad referencial habitual.",
+    description=(
+        "Borra definitivamente el libro solo si esta **desactivado** (`activo=false`). "
+        "Si sigue activo, responde **409**; usa PATCH con activo=false primero."
+    ),
     response_description="Sin cuerpo (204 No Content) si se elimino correctamente.",
 )
 def eliminar_libro(libro_id: int, db: SesionDB):
     libro = db.get(Libro, libro_id)
     if libro is None:
         raise HTTPException(status_code=404, detail="Libro no encontrado")
+    if libro.activo:
+        raise HTTPException(
+            status_code=409,
+            detail=(
+                "No se puede eliminar el libro de la base de datos mientras sigue activo. "
+                "Primero desactivalo (borrado pasivo: PATCH con activo=false o el boton Desactivar); "
+                "luego podras borrarlo definitivamente."
+            ),
+        )
     db.delete(libro)
     db.commit()
     return None

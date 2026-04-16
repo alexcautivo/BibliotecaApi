@@ -21,6 +21,13 @@ import { mensajeApiError } from '../../utils/api-error';
         {{ apiAdvertencia }}
       </div>
       <p *ngIf="msgAccion" class="text-sm text-emerald-800">{{ msgAccion }}</p>
+      <div
+        *ngIf="errorAccion"
+        class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900"
+        role="alert"
+      >
+        {{ errorAccion }}
+      </div>
 
       <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -68,7 +75,7 @@ import { mensajeApiError } from '../../utils/api-error';
                     <button
                       type="button"
                       class="rounded bg-red-700 px-2 py-1 text-xs text-white hover:bg-red-800"
-                      (click)="eliminarDuro(a.id)"
+                      (click)="eliminarDuro(a.id, a.activo)"
                     >
                       Eliminar (BD)
                     </button>
@@ -224,6 +231,7 @@ export class AutoresComponent implements OnInit {
   /** Aviso si el proceso uvicorn no es el codigo nuevo (sin DELETE / sin columna activo). */
   apiAdvertencia = '';
   msgAccion = '';
+  errorAccion = '';
 
   autores: Autor[] = [];
   incluirInactivos = false;
@@ -355,31 +363,41 @@ export class AutoresComponent implements OnInit {
 
   desactivar(id: number): void {
     this.msgAccion = '';
+    this.errorAccion = '';
     this.api.parchearAutor(id, { activo: false }).subscribe({
       next: () => {
         this.msgAccion = `Autor ${id} desactivado (delete pasivo).`;
         this.refrescarLista();
       },
       error: (err) => {
-        this.msgAccion = `Error: ${mensajeApiError(err)}`;
+        this.errorAccion = mensajeApiError(err);
       },
     });
   }
 
   reactivar(id: number): void {
     this.msgAccion = '';
+    this.errorAccion = '';
     this.api.parchearAutor(id, { activo: true }).subscribe({
       next: () => {
         this.msgAccion = `Autor ${id} reactivado.`;
         this.refrescarLista();
       },
       error: (err) => {
-        this.msgAccion = `Error: ${mensajeApiError(err)}`;
+        this.errorAccion = mensajeApiError(err);
       },
     });
   }
 
-  eliminarDuro(id: number): void {
+  eliminarDuro(id: number, activo: boolean): void {
+    this.errorAccion = '';
+    if (activo) {
+      this.msgAccion = '';
+      this.errorAccion =
+        'No se puede eliminar el autor de la base de datos mientras sigue activo. ' +
+        'Primero pulsa Desactivar (borrado pasivo); después podrás usar Eliminar (BD) si no tiene libros asociados.';
+      return;
+    }
     if (!confirm(`Eliminar definitivamente el autor id ${id}?`)) return;
     this.msgAccion = '';
     this.api.eliminarAutor(id).subscribe({
@@ -388,7 +406,7 @@ export class AutoresComponent implements OnInit {
         this.refrescarLista();
       },
       error: (err) => {
-        this.msgAccion = `Error: ${mensajeApiError(err)}`;
+        this.errorAccion = mensajeApiError(err);
       },
     });
   }
@@ -414,6 +432,7 @@ export class AutoresComponent implements OnInit {
   eliminarManual(): void {
     this.okHard = '';
     this.errorHard = '';
+    this.errorAccion = '';
     if (this.hardId == null || this.hardId < 1) {
       this.errorHard = 'Id invalido.';
       return;

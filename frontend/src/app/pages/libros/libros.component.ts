@@ -21,6 +21,13 @@ import { mensajeApiError } from '../../utils/api-error';
         {{ apiAdvertencia }}
       </div>
       <p *ngIf="msgAccion" class="text-sm text-emerald-800">{{ msgAccion }}</p>
+      <div
+        *ngIf="errorAccion"
+        class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900"
+        role="alert"
+      >
+        {{ errorAccion }}
+      </div>
 
       <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
@@ -72,7 +79,7 @@ import { mensajeApiError } from '../../utils/api-error';
                     <button
                       type="button"
                       class="rounded bg-red-700 px-2 py-1 text-xs text-white hover:bg-red-800"
-                      (click)="eliminarDuro(l.id)"
+                      (click)="eliminarDuro(l.id, l.activo)"
                     >
                       Eliminar (BD)
                     </button>
@@ -261,6 +268,8 @@ export class LibrosComponent implements OnInit {
 
   apiAdvertencia = '';
   msgAccion = '';
+  /** Errores de acciones en fila (desactivar / reactivar / eliminar): visible en rojo. */
+  errorAccion = '';
 
   libros: Libro[] = [];
   autores: Autor[] = [];
@@ -418,31 +427,41 @@ export class LibrosComponent implements OnInit {
 
   desactivar(id: number): void {
     this.msgAccion = '';
+    this.errorAccion = '';
     this.api.parchearLibro(id, { activo: false }).subscribe({
       next: () => {
         this.msgAccion = `Libro ${id} desactivado (delete pasivo).`;
         this.cargarAutoresYLibros();
       },
       error: (err) => {
-        this.msgAccion = `Error: ${mensajeApiError(err)}`;
+        this.errorAccion = mensajeApiError(err);
       },
     });
   }
 
   reactivar(id: number): void {
     this.msgAccion = '';
+    this.errorAccion = '';
     this.api.parchearLibro(id, { activo: true }).subscribe({
       next: () => {
         this.msgAccion = `Libro ${id} reactivado.`;
         this.cargarAutoresYLibros();
       },
       error: (err) => {
-        this.msgAccion = `Error: ${mensajeApiError(err)}`;
+        this.errorAccion = mensajeApiError(err);
       },
     });
   }
 
-  eliminarDuro(id: number): void {
+  eliminarDuro(id: number, activo: boolean): void {
+    this.errorAccion = '';
+    if (activo) {
+      this.msgAccion = '';
+      this.errorAccion =
+        'No se puede eliminar el libro de la base de datos mientras sigue activo. ' +
+        'Primero pulsa Desactivar (borrado pasivo); después podrás usar Eliminar (BD).';
+      return;
+    }
     if (!confirm(`Eliminar definitivamente el libro id ${id}?`)) return;
     this.msgAccion = '';
     this.api.eliminarLibro(id).subscribe({
@@ -451,7 +470,7 @@ export class LibrosComponent implements OnInit {
         this.cargarAutoresYLibros();
       },
       error: (err) => {
-        this.msgAccion = `Error: ${mensajeApiError(err)}`;
+        this.errorAccion = mensajeApiError(err);
       },
     });
   }
@@ -477,6 +496,7 @@ export class LibrosComponent implements OnInit {
   eliminarManual(): void {
     this.okHard = '';
     this.errorHard = '';
+    this.errorAccion = '';
     if (this.hardId == null || this.hardId < 1) {
       this.errorHard = 'Id invalido.';
       return;

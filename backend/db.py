@@ -13,7 +13,7 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 load_dotenv()
 
 # Cadena por defecto para desarrollo local; cambiala en .env
-_DEFAULT_URL = "postgresql+psycopg://postgres:postgres@localhost:5432/postgres"
+_DEFAULT_URL = "postgresql+psycopg://postgres:postgres@localhost:5432/biblioteca_api"
 
 DATABASE_URL = os.getenv("DATABASE_URL", _DEFAULT_URL)
 
