@@ -1,0 +1,17 @@
+# Backend Biblioteca API (FastAPI + PostgreSQL)
+# Instalacion: pip install -r requirements.txt
+
+# Framework HTTP y validacion (incluye Pydantic)
+fastapi==0.115.8
+
+# Servidor ASGI con recarga en desarrollo
+uvicorn[standard]==0.34.0
+
+# ORM
+sqlalchemy==2.0.38
+
+# Driver PostgreSQL (psycopg 3)
+psycopg[binary]==3.3.3
+
+# Lectura de variables de entorno desde .env
+python-dotenv==1.0.1

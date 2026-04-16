@@ -1,0 +1,30 @@
+<div class="min-h-screen bg-slate-100">
+  <header class="border-b border-slate-200 bg-white shadow-sm">
+    <nav class="mx-auto flex max-w-5xl flex-wrap items-center gap-4 px-4 py-3">
+      <span class="font-semibold text-slate-800">Demo API biblioteca</span>
+      <a
+        routerLink="/"
+        routerLinkActive="text-emerald-700"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="text-sm text-slate-600 hover:text-slate-900"
+        >Inicio</a
+      >
+      <a
+        routerLink="/autores"
+        routerLinkActive="text-emerald-700"
+        class="text-sm text-slate-600 hover:text-slate-900"
+        >Autores</a
+      >
+      <a
+        routerLink="/libros"
+        routerLinkActive="text-emerald-700"
+        class="text-sm text-slate-600 hover:text-slate-900"
+        >Libros</a
+      >
+    </nav>
+  </header>
+  <main class="pb-0">
+    <router-outlet />
+  </main>
+  <app-api-debug-panel />
+</div>
